@@ -66,8 +66,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
 #      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/vpc.yaml
-      TemplateURL:
-        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/vpc.yaml"
+      TemplateURL: App::vpc.yaml
+#        Fn::ImportValue: !Sub "https://s3-${AWS::Region}.amazonaws.com/${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/vpc.yaml"
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         EnvironmentFlag: !Ref EnvironmentFlag
@@ -82,8 +82,8 @@ Resources:
     DependsOn: 'VPC'
     Properties:
 #      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/security-groups.yaml
-      TemplateURL:
-        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/security-groups.yaml"
+      TemplateURL: App::security-groups.yaml
+#        Fn::ImportValue: !Sub "https://s3-${AWS::Region}.amazonaws.com/${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/security-groups.yaml"
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         EnvironmentFlag: !Ref EnvironmentFlag
@@ -95,8 +95,8 @@ Resources:
     DependsOn: 'SecurityGroups'
     Properties:
 #      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-cluster.yaml
-      TemplateURL:
-        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-cluster.yaml"
+      TemplateURL: App::ecs-cluster.yaml
+#        Fn::ImportValue: !Sub "https://s3-${AWS::Region}.amazonaws.com/${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-cluster.yaml"
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         EnvironmentFlag: !Ref EnvironmentFlag
@@ -109,8 +109,8 @@ Resources:
     DependsOn: 'SecurityGroups'
     Properties:
 #      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-app-load-balancer.yaml
-      TemplateURL:
-        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-app-load-balancer.yaml"
+      TemplateURL: App::ecs-app-load-balancer.yaml
+#        Fn::ImportValue: !Sub "https://s3-${AWS::Region}.amazonaws.com/${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-app-load-balancer.yaml"
       Parameters:
         EnvironmentName: !Ref EnvironmentName
         EnvironmentFlag: !Ref EnvironmentFlag
@@ -128,8 +128,8 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
 #      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-deployment-pipeline.yaml
-      TemplateURL:
-        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-deployment-pipeline.yaml"
+      TemplateURL: App::ecs-deployment-pipeline.yaml
+#        Fn::ImportValue: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket/ecs-deployment-pipeline.yaml"
       Parameters:
         Cluster: !GetAtt ECSCluster.Outputs.ClusterName
         GitHubUser: !Ref GitHubUser
