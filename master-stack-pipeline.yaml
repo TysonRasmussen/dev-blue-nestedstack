@@ -161,4 +161,4 @@ Outputs:
   ArtifactBucket:
     Value: !Ref ArtifactBucket
     Export:
-      Name: !Sub "${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket"
+      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "ArtifactBucket" ]]
