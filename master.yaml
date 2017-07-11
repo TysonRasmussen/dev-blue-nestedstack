@@ -1,0 +1,158 @@
+Parameters:
+
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: dev
+
+  EnvironmentFlag:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+    Default: blue
+
+  GitHubUser:
+    Type: String
+    Description: Your username on GitHub.
+    Default: shehryarabbasi
+
+  GitHubRepo:
+    Type: String
+    Default: ecs-demo-php-simple-app
+    Description: The repo name of the sample service.
+
+  GitHubBranch:
+    Type: String
+    Default: master
+    Description: The branch of the repo to continuously deploy.
+
+  GitHubToken:
+    Type: String
+    Description: Token for the user specified above. (https://github.com/settings/tokens)
+    Default: blank
+
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterLabels:
+      EnvironmentName:
+        default: "dev"
+      GitHubUser:
+        default: "User"
+      GitHubRepo:
+        default: "Repo"
+      GitHubBranch:
+        default: "Branch"
+      GitHubToken:
+        default: "Personal Access Token"
+    ParameterGroups:
+      - Label:
+          default: GitHub Configuration
+        Parameters:
+          - GitHubRepo
+          - GitHubBranch
+          - GitHubUser
+          - GitHubToken
+      - Label:
+          default: Environment
+        Parameters:
+          - EnvironmentName
+          - EnvironmentFlag
+
+
+Resources:
+
+## Network Resources
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/vpc.yaml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        EnvironmentFlag: !Ref EnvironmentFlag
+        VpcCIDR: 10.215.0.0/16
+        PublicSubnet1CIDR: 10.215.10.0/24
+        PublicSubnet2CIDR: 10.215.20.0/24
+        PrivateSubnet1CIDR: 10.215.30.0/24
+        PrivateSubnet2CIDR: 10.215.31.0/24
+
+  SecurityGroups:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: 'VPC'
+    Properties:
+      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/security-groups.yaml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        EnvironmentFlag: !Ref EnvironmentFlag
+        VpcId: !GetAtt VPC.Outputs.VpcId
+
+## ECS resources
+  ECSCluster:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: 'SecurityGroups'
+    Properties:
+      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-cluster.yaml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        EnvironmentFlag: !Ref EnvironmentFlag
+        SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
+        Subnets: !GetAtt VPC.Outputs.PrivateSubnets
+        VpcId: !GetAtt VPC.Outputs.VpcId
+
+  ECSAppLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: 'SecurityGroups'
+    Properties:
+      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-app-load-balancer.yaml
+      Parameters:
+        EnvironmentName: !Ref EnvironmentName
+        EnvironmentFlag: !Ref EnvironmentFlag
+        Subnets: !GetAtt VPC.Outputs.PublicSubnets
+        SecurityGroup: !GetAtt SecurityGroups.Outputs.LoadBalancerSecurityGroup
+        VpcId: !GetAtt VPC.Outputs.VpcId
+
+  # ECSApiGateway:
+  #   Type: AWS::CloudFormation::Stack
+  #   Properties:
+  #     TemplateURL: https://s3.amazonaws.com/ecs-refarch-continuous-deployment/templates/ecs-api-gateway.yaml
+
+## Code* pipelines
+  ECSDeploymentPipeline:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-deployment-pipeline.yaml
+      Parameters:
+        Cluster: !GetAtt ECSCluster.Outputs.ClusterName
+        GitHubUser: !Ref GitHubUser
+        GitHubToken: !Ref GitHubToken
+        GitHubRepo: !Ref GitHubRepo
+        GitHubBranch: !Ref GitHubBranch
+        TargetGroup: !GetAtt ECSAppLoadBalancer.Outputs.TargetGroup
+        TemplateBucket: !Sub ecs-refarch-cicd-template-bucket-${AWS::Region}
+
+  #  LambdaDeploymentPipeline:
+  #    Type: AWS::CloudFormation::Stack
+  #    Properties:
+  #      TemplateURL: https://s3.amazonaws.com/ecs-refarch-continuous-deployment/templates/lambda-deployment-pipeline.yaml
+  #      Parameters:
+  #        Cluster: !GetAtt Cluster.Outputs.ClusterName
+  #        GitHubUser: !Ref GitHubUser
+  #        GitHubToken: !Ref GitHubToken
+  #        GitHubRepo: !Ref GitHubRepo
+  #        GitHubBranch: !Ref GitHubBranch
+  #        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
+  #        TemplateBucket: !Sub lambda-refarch-cicd-template-bucket-${AWS::Region}
+
+Outputs:
+  ECSLoadBalancerUrl:
+    Description: ECS Application Loadbalancer's URL
+    Value: !GetAtt ECSAppLoadBalancer.Outputs.LoadBalancerUrl
+
+  ECSPipelineUrl:
+    Description: The continuous deployment pipeline in the AWS Management Console.
+    Value: !GetAtt ECSDeploymentPipeline.Outputs.PipelineUrl
+
+  MasterStackName:
+    Description: output the name of this master nested stack
+    Value: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
+    Export:
+      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "MasterStack" ]]
