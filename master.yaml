@@ -70,8 +70,8 @@ Resources:
 ## Network Resources
   VPC:
     Type: AWS::CloudFormation::Stack
+    DisableRollback: true
     Properties:
-      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/vpc.yaml
       TemplateURL: !Join
         - "/"
@@ -90,8 +90,8 @@ Resources:
   SecurityGroups:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'VPC'
+    DisableRollback: true
     Properties:
-      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/security-groups.yaml
       TemplateURL: !Join
         - "/"
@@ -107,8 +107,8 @@ Resources:
   ECSCluster:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
+    DisableRollback: true
     Properties:
-      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-cluster.yaml
       TemplateURL: !Join
         - "/"
@@ -125,8 +125,8 @@ Resources:
   ECSAppLoadBalancer:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
+    DisableRollback: true
     Properties:
-      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-app-load-balancer.yaml
       TemplateURL: !Join
         - "/"
