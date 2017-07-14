@@ -71,6 +71,7 @@ Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
+      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/vpc.yaml
       TemplateURL: !Join
         - "/"
@@ -90,6 +91,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'VPC'
     Properties:
+      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/security-groups.yaml
       TemplateURL: !Join
         - "/"
@@ -106,6 +108,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
     Properties:
+      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-cluster.yaml
       TemplateURL: !Join
         - "/"
@@ -123,6 +126,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
     Properties:
+      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-app-load-balancer.yaml
       TemplateURL: !Join
         - "/"
@@ -141,6 +145,7 @@ Resources:
   ECSDeploymentPipeline:
     Type: AWS::CloudFormation::Stack
     Properties:
+      DisableRollback: true
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-deployment-pipeline.yaml
       TemplateURL: !Join
         - "/"

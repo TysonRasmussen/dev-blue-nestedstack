@@ -196,7 +196,7 @@ Resources:
                 ChangeSetName: Deploy
                 ActionMode: CREATE_UPDATE
                 StackName: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
-                Capabilities: CAPABILITY_NAMED_IAM
+                Capabilities: CAPABILITY_IAM
                 TemplatePath: NestedStackZip::master.yaml
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 ParameterOverrides: !Sub |
