@@ -12,7 +12,7 @@ Parameters:
   BuildArtifactsBucket:
     Description: existing s3 bucket, in this Region, to store build artifacts
     Type: String
-    Default: ref-arch-msi/dev-blue-artifactbucket
+    Default: ref-arch-msi
 
   GitHubRepo:
     Type: String
@@ -166,20 +166,21 @@ Resources:
               OutputArtifacts:
                 - Name: NestedStack
               RunOrder: 1
-            - Name: Build
-              Actions:
-                - Name: CodeBuild
-                  ActionTypeId:
-                    Category: Build
-                    Owner: AWS
-                    Provider: CodeBuild
-                    Version: 1
-                  Configuration:
-                    ProjectName: !Ref CodeBuildProject
-                  InputArtifacts:
-                    - Name: NestedStack
-                  OutputArtifacts:
-                    - Name: NestedStackZip
+        - Name: Build
+          Actions:
+            - Name: CodeBuild
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: 1
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: NestedStack
+              OutputArtifacts:
+                - Name: NestedStackZip
+              RunOrder: 1
         - Name: Deploy
           Actions:
             - Name: Deploy
@@ -204,7 +205,7 @@ Resources:
                     "GitHubBranch": "${GitHubBranch}"
                   }
               InputArtifacts:
-                - Name: App
+                - Name: NestedStackZip
               RunOrder: 1
 
 
