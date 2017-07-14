@@ -10,7 +10,7 @@ Parameters:
     Default: blue
 
   BuildArtifactsBucket:
-    Description: !Sub existing s3 bucket in ${AWS::Region} to store build artifacts
+    Description: existing s3 bucket, in this Region, to store build artifacts
     Type: String
     Default: ref-arch-msi/dev-blue-artifactbucket
 
