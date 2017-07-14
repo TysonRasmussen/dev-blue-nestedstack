@@ -75,7 +75,7 @@ Resources:
       TemplateURL: !Join
         - "/"
         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
           - vpc.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -94,7 +94,7 @@ Resources:
       TemplateURL: !Join
         - "/"
         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
           - security-groups.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -110,7 +110,7 @@ Resources:
       TemplateURL: !Join
         - "/"
         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
           - ecs-cluster.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -127,7 +127,7 @@ Resources:
       TemplateURL: !Join
         - "/"
         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
           - ecs-app-load-balancer.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -145,7 +145,7 @@ Resources:
       TemplateURL: !Join
         - "/"
         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
           - ecs-deployment-pipeline.yaml
       Parameters:
         Cluster: !GetAtt ECSCluster.Outputs.ClusterName
@@ -183,9 +183,3 @@ Outputs:
     Value: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
     Export:
       Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "MasterStack" ]]
-
-  BuildArtifactsBucket:
-    Description: name of the refrenced s3 bucket where nested stacks can be stored
-    Value: !Ref BuildArtifactsBucket
-    Export:
-      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "BuildArtifactsBucket" ]]

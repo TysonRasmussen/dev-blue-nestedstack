@@ -14,6 +14,11 @@ Parameters:
     Type: String
     Default: ref-arch-msi
 
+  BuildArtifactsBucketFolder:
+    Description: subfolder inside existing s3 bucket, in this Region, to store build artifacts
+    Type: String
+    Default: dev-blue-artifactbucket
+
   GitHubRepo:
     Type: String
     Default: dev-blue-nestedstack
@@ -80,14 +85,12 @@ Resources:
                   - !Sub arn:aws:s3:::${BuildArtifactsBucket}/*
                 Effect: Allow
                 Action:
-                  - s3:PutObject
-                  - s3:GetObject
-                  - s3:GetObjectVersion
-                  - s3:GetBucketVersioning
+                  - s3:*
               - Resource: "*"
                 Effect: Allow
                 Action:
                   - cloudformation:*
+                  - codebuild:*
                   - iam:PassRole
 
   # CodeBuild project and resources (S3 Bucket for build artifacts, Role, Project)
@@ -214,6 +217,6 @@ Outputs:
     Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
 
   BuildArtifactsBucket:
-    Value: !Ref BuildArtifactsBucket
+    Value: !Sub ${BuildArtifactsBucket}/${BuildArtifactsBucketFolder}
     Export:
-      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "BuildArtifactsBucket" ]]
+      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "BuildArtifacts" ]]
