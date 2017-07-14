@@ -10,6 +10,12 @@ Parameters:
     Type: String
     Default: blue
 
+  # we will be Importing in the name of the s3 bucket from the Export of master-stack-pipeline.yaml
+  # BuildArtifactsBucket:
+  #   Description: !Sub existing s3 bucket in ${AWS::Region}, to reference for nested templates
+  #   Type: String
+  #   Default: ref-arch-msi/dev-blue-artifactbucket
+
   GitHubUser:
     Type: String
     Description: Your username on GitHub.
@@ -65,11 +71,11 @@ Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-#      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/vpc.yaml
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/vpc.yaml
       TemplateURL: !Join
         - "/"
-        - - "https://s3-us-west-1.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
           - vpc.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -84,11 +90,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'VPC'
     Properties:
-#      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/security-groups.yaml
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/security-groups.yaml
       TemplateURL: !Join
         - "/"
-        - - "https://s3-us-west-1.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
           - security-groups.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -100,11 +106,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
     Properties:
-#      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-cluster.yaml
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-cluster.yaml
       TemplateURL: !Join
         - "/"
-        - - "https://s3-us-west-1.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
           - ecs-cluster.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -117,11 +123,11 @@ Resources:
     Type: AWS::CloudFormation::Stack
     DependsOn: 'SecurityGroups'
     Properties:
-#      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-app-load-balancer.yaml
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-app-load-balancer.yaml
       TemplateURL: !Join
         - "/"
-        - - "https://s3-us-west-1.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
           - ecs-app-load-balancer.yaml
       Parameters:
         EnvironmentName: !Ref EnvironmentName
@@ -130,20 +136,16 @@ Resources:
         SecurityGroup: !GetAtt SecurityGroups.Outputs.LoadBalancerSecurityGroup
         VpcId: !GetAtt VPC.Outputs.VpcId
 
-  # ECSApiGateway:
-  #   Type: AWS::CloudFormation::Stack
-  #   Properties:
-  #     TemplateURL: https://s3.amazonaws.com/ecs-refarch-continuous-deployment/templates/ecs-api-gateway.yaml
 
-## Code* pipelines
+## application pipeline for ECS
   ECSDeploymentPipeline:
     Type: AWS::CloudFormation::Stack
     Properties:
-#      TemplateURL: https://s3-us-west-1.amazonaws.com/ref-arch-msi/nested-templates-a/ecs-deployment-pipeline.yaml
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-deployment-pipeline.yaml
       TemplateURL: !Join
         - "/"
-        - - "https://s3-us-west-1.amazonaws.com"
-          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-ArtifactBucket
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifactsBucket
           - ecs-deployment-pipeline.yaml
       Parameters:
         Cluster: !GetAtt ECSCluster.Outputs.ClusterName
@@ -177,7 +179,13 @@ Outputs:
     Value: !GetAtt ECSDeploymentPipeline.Outputs.PipelineUrl
 
   MasterStackName:
-    Description: output the name of this master nested stack
+    Description: name of this master nested stack
     Value: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
     Export:
       Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "MasterStack" ]]
+
+  BuildArtifactsBucket:
+    Description: name of the refrenced s3 bucket where nested stacks can be stored
+    Value: !Ref BuildArtifactsBucket
+    Export:
+      Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "BuildArtifactsBucket" ]]

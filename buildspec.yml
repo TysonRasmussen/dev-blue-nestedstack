@@ -1,0 +1,25 @@
+version: 0.1
+
+environment_variables:
+  plaintext:
+    TEMPLATE_FILES: |
+      master.yaml
+      vpc.yaml
+      security-groups.yaml
+      ecs-cluster.yaml
+      ecs-deployment-pipeline.yaml
+      ecs-app-load-balancer.yaml
+      lambda-deployment-pipeline.yaml
+
+phases:
+  build:
+    commands:
+      - echo "Copying templates to S3"
+      - |
+        for template in $TEMPLATE_FILES; do
+            aws s3 cp "$template" "s3://ref-arch-msi/dev-blue-artifactbucket/$template"
+        done
+
+artifacts:
+  files:
+    - master.yaml

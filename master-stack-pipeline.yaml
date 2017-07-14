@@ -9,11 +9,18 @@ Parameters:
     Type: String
     Default: blue
 
+  BuildArtifactsBucket:
+    Description: !Sub existing s3 bucket in ${AWS::Region} to store build artifacts
+    Type: String
+    Default: ref-arch-msi/dev-blue-artifactbucket
+
   GitHubRepo:
     Type: String
+    Default: dev-blue-nestedstack
 
   GitHubBranch:
     Type: String
+    Default: master
 
   GitHubToken:
     Type: String
@@ -21,13 +28,10 @@ Parameters:
 
   GitHubUser:
     Type: String
+    Default: shehryarabbasi
 
 
 Resources:
-  Repository:
-    Type: AWS::ECR::Repository
-    DeletionPolicy: Retain
-
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     DeletionPolicy: Retain
@@ -86,59 +90,57 @@ Resources:
                   - cloudformation:*
                   - iam:PassRole
 
-# CodeBuild project and resources (S3 Bucket for build artifacts, Role, Project)
-BuildArtifactsBucket:
-    Type: AWS::S3::Bucket
-CodeBuildServiceRole:
-    Type: AWS::IAM::Role
-    Properties:
-        AssumeRolePolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                  - 'sts:AssumeRole'
-                Effect: Allow
-                Principal:
-                  Service:
-                    - codebuild.amazonaws.com
-        Path: /
-        Policies:
-            - PolicyName: CodeBuildAccess
-              PolicyDocument:
-                Version: '2012-10-17'
-                Statement:
-                  - Effect: Allow
-                    Resource:
-                      - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build'
-                      - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build:*'
-                    Action:
-                      - 'logs:CreateLogGroup'
-                      - 'logs:CreateLogStream'
-                      - 'logs:PutLogEvents'
-                  - Effect: Allow
-                    Resource:
-                      - !Sub 'arn:aws:s3:::${BuildArtifactsBucket}/*'
-                    Action:
-                      - 's3:GetObject'
-                      - 's3:GetObjectVersion'
-                      - 's3:PutObject'
-CodeBuildProject:
-    Type: AWS::CodeBuild::Project
-    Properties:
-        Name: !Sub '${GitHubRepo}_build'
-        Description: Build project for the Lambda service
-        Artifacts:
-          Type: CODEPIPELINE
-        Environment:
-            Type: LINUX_CONTAINER
-            ComputeType: BUILD_GENERAL1_SMALL
-            Image: aws/codebuild/eb-nodejs-4.4.6-amazonlinux-64:2.1.3
-            EnvironmentVariables:
-              - Name: BUILD_OUTPUT_BUCKET
-                Value: !Ref BuildArtifactsBucket
-        ServiceRole: !GetAtt CodeBuildServiceRole.Arn
-        Source:
+  # CodeBuild project and resources (S3 Bucket for build artifacts, Role, Project)
+  CodeBuildServiceRole:
+      Type: AWS::IAM::Role
+      Properties:
+          AssumeRolePolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Action:
+                    - 'sts:AssumeRole'
+                  Effect: Allow
+                  Principal:
+                    Service:
+                      - codebuild.amazonaws.com
+          Path: /
+          Policies:
+              - PolicyName: CodeBuildAccess
+                PolicyDocument:
+                  Version: '2012-10-17'
+                  Statement:
+                    - Effect: Allow
+                      Resource:
+                        - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build'
+                        - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build:*'
+                      Action:
+                        - 'logs:CreateLogGroup'
+                        - 'logs:CreateLogStream'
+                        - 'logs:PutLogEvents'
+                    - Effect: Allow
+                      Resource:
+                        - !Sub 'arn:aws:s3:::${BuildArtifactsBucket}/*'
+                      Action:
+                        - 's3:GetObject'
+                        - 's3:GetObjectVersion'
+                        - 's3:PutObject'
+  CodeBuildProject:
+      Type: AWS::CodeBuild::Project
+      Properties:
+          Name: !Sub '${GitHubRepo}_build'
+          Description: Build project for the Lambda service
+          Artifacts:
             Type: CODEPIPELINE
+          Environment:
+              Type: LINUX_CONTAINER
+              ComputeType: BUILD_GENERAL1_SMALL
+              Image: aws/codebuild/eb-nodejs-4.4.6-amazonlinux-64:2.1.3
+              EnvironmentVariables:
+                - Name: BUILD_OUTPUT_BUCKET
+                  Value: !Sub ${BuildArtifactsBucket}
+          ServiceRole: !GetAtt CodeBuildServiceRole.Arn
+          Source:
+              Type: CODEPIPELINE
 
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
