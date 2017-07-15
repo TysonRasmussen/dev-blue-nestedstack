@@ -37,7 +37,8 @@ Parameters:
 
 
 Resources:
-  CCloudFormationExecutionRole:
+
+  CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -52,37 +53,59 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AdministratorAccess'
-
-
   CodePipelineServiceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument: |
-        {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": { "Service": [ "codepipeline.amazonaws.com" ]},
-                "Action": [ "sts:AssumeRole" ]
-            }]
-        }
-      Policies:
-        - PolicyName: root
+      Type: AWS::IAM::Role
+      Properties:
+          AssumeRolePolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Action:
+                  - 'sts:AssumeRole'
+                  Effect: Allow
+                  Principal:
+                    Service:
+                      - codepipeline.amazonaws.com
+          Path: /
+          ManagedPolicyArns:
+              - 'arn:aws:iam::aws:policy/AWSCodeCommitFullAccess'
+              - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+              - !Ref CFNPipelinePolicy
+          Policies:
+              - PolicyName: CodePipelineAccess
+                PolicyDocument:
+                  Version: '2012-10-17'
+                  Statement:
+                      - Action:
+                          - 'iam:PassRole'
+                          - 'lambda:InvokeFunction'
+                          - 'lambda:ListFunctions'
+                          - 'lambda:InvokeAsyc'
+                        Effect: Allow
+                        Resource: '*'
+  CFNPipelinePolicy:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+          Description: CloudFormation Pipeline Execution Policy
+          Path: "/"
           PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Resource:
-                  - !Sub arn:aws:s3:::${BuildArtifactsBucket}/*
-                Effect: Allow
-                Action:
-                  - s3:*
-              - Resource: "*"
-                Effect: Allow
-                Action:
-                  - cloudformation:*
-                  - codebuild:*
-                  - iam:PassRole
-                  - ec2:*
+              Version: '2012-10-17'
+              Statement:
+                  Effect: Allow
+                  Action:
+                      - 'cloudformation:CreateStack'
+                      - 'cloudformation:DescribeStacks'
+                      - 'cloudformation:DeleteStack'
+                      - 'cloudformation:UpdateStack'
+                      - 'cloudformation:CreateChangeSet'
+                      - 'cloudformation:ExecuteChangeSet'
+                      - 'cloudformation:DeleteChangeSet'
+                      - 'cloudformation:DescribeChangeSet'
+                      - 'cloudformation:SetStackPolicy'
+                      - 'cloudformation:SetStackPolicy'
+                      - 'cloudformation:ValidateTemplate'
+                      - 'codebuild:StartBuild'
+                      - 'codebuild:BatchGetBuilds'
+                  Resource: "*"
 
   # CodeBuild project and resources (S3 Bucket for build artifacts, Role, Project)
   CodeBuildServiceRole:
@@ -218,6 +241,7 @@ Resources:
                 Version: 1
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
+                Capabilities: CAPABILITY_IAM
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 StackName: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
                 ChangeSetName: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
