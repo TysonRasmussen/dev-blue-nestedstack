@@ -44,7 +44,7 @@ Metadata:
         default: "dev"
       GitHubUser:
         default: "User"
-      GitHubRepo:
+      GitHubRepoECS:
         default: "Repo"
       GitHubBranch:
         default: "Branch"
@@ -54,7 +54,7 @@ Metadata:
       - Label:
           default: GitHub Configuration
         Parameters:
-          - GitHubRepo
+          - GitHubRepoECS
           - GitHubBranch
           - GitHubUser
           - GitHubToken
@@ -151,7 +151,7 @@ Resources:
         Cluster: !GetAtt ECSCluster.Outputs.ClusterName
         GitHubUser: !Ref GitHubUser
         GitHubToken: !Ref GitHubToken
-        GitHubRepo: !Ref GitHubRepo
+        GitHubRepoECS: !Ref GitHubRepoECS
         GitHubBranch: !Ref GitHubBranch
         TargetGroup: !GetAtt ECSAppLoadBalancer.Outputs.TargetGroup
         TemplateBucket: !Sub ecs-refarch-cicd-template-bucket-${AWS::Region}
