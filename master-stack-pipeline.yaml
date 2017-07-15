@@ -226,13 +226,13 @@ Resources:
               InputArtifacts:
                 - Name: NestedStackZip
               RunOrder: 1
-            - Name: DeploymentApproval
-              ActionTypeId:
-                Category: Approval
-                Owner: AWS
-                Provider: Manual
-                Version: 1
-              RunOrder: 2
+            # - Name: DeploymentApproval
+            #   ActionTypeId:
+            #     Category: Approval
+            #     Owner: AWS
+            #     Provider: Manual
+            #     Version: 1
+            #   RunOrder: 2
             - Name: ExecuteChangeSet
               ActionTypeId:
                 Category: Deploy
@@ -241,13 +241,13 @@ Resources:
                 Version: 1
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
-                Capabilities: CAPABILITY_IAM
+                Capabilities: CAPABILITY_NAMED_IAM
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 StackName: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
                 ChangeSetName: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
               OutputArtifacts:
                 - Name: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
-              RunOrder: 3
+              RunOrder: 2
 
 
 
