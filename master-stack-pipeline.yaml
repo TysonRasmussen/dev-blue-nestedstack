@@ -59,11 +59,13 @@ Resources:
                 Effect: Allow
                 Action:
                   - ecs:*
+                  - ec2:*
                   - ecr:*
                   - iam:*
                   - s3:*
                   - cloudformation:*
                   - codepipeline:*
+                  - codebuild:*
 
 
   CodePipelineServiceRole:
@@ -94,6 +96,7 @@ Resources:
                   - cloudformation:*
                   - codebuild:*
                   - iam:PassRole
+                  - ec2:*
 
   # CodeBuild project and resources (S3 Bucket for build artifacts, Role, Project)
   CodeBuildServiceRole:
