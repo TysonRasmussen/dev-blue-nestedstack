@@ -37,35 +37,21 @@ Parameters:
 
 
 Resources:
-  CloudFormationExecutionRole:
+  CCloudFormationExecutionRole:
     Type: AWS::IAM::Role
-    DeletionPolicy: Retain
     Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          Action:
+            - 'sts:AssumeRole'
+          Effect: Allow
+          Principal:
+            Service:
+              - cloudformation.amazonaws.com
       Path: /
-      AssumeRolePolicyDocument: |
-        {
-            "Statement": [{
-                "Effect": "Allow",
-                "Principal": { "Service": [ "cloudformation.amazonaws.com" ]},
-                "Action": [ "sts:AssumeRole" ]
-            }]
-        }
-      Policies:
-        - PolicyName: root
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Resource: "*"
-                Effect: Allow
-                Action:
-                  - ecs:*
-                  - ec2:*
-                  - ecr:*
-                  - iam:*
-                  - s3:*
-                  - cloudformation:*
-                  - codepipeline:*
-                  - codebuild:*
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
 
 
   CodePipelineServiceRole:
