@@ -12,7 +12,7 @@
 4. create cloudformation stack using `master-stack-pipeline.yaml` (through the aws cli or aws console UI, disable rollbacks)
 5. There is a manual approval stage in the pipeline before it executes changes to your infrastructure.
 
-### stacks
+### Result
 1. the platform pipeline creates the following:
     1. master-stack
         1. VPC with 2 Public and 2 Private Subnets
