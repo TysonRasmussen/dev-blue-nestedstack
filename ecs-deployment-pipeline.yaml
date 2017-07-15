@@ -1,6 +1,4 @@
 Parameters:
-  GitHubRepoPlatform:
-    Type: String
 
   GitHubRepoECS:
     Type: String
