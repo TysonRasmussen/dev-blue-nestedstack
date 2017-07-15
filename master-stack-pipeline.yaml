@@ -29,12 +29,18 @@ Parameters:
     Type: String
     Default: ecs-demo-php-simple-app
 
+  GithubRepoLambda:
+    Description: third github repo containing Lambda (SAM) code
+    Type: String
+    Default: lambdaSAM
+
   GitHubBranch:
     Type: String
     Default: master
 
   GitHubToken:
     Type: String
+    NoEcho: true
     Default: blank
 
   GitHubUser:
@@ -227,6 +233,7 @@ Resources:
                     "GitHubUser": "${GitHubUser}",
                     "GitHubRepoPlatform": "${GitHubRepoPlatform}",
                     "GitHubRepoECS": "${GitHubRepoECS}",
+                    "GithubRepoLambda": "${GithubRepoLambda}",
                     "GitHubBranch": "${GitHubBranch}"
                   }
               InputArtifacts:

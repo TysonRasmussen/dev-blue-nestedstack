@@ -19,27 +19,32 @@ Parameters:
   GitHubUser:
     Type: String
     Description: Your username on GitHub.
-    Default: shehryarabbasi
+#    Default: shehryarabbasi
 
   GitHubRepoPlatform:
     Description: first github repo which contains the nested stacks
     Type: String
-    Default: dev-blue-nestedstack
+#    Default: dev-blue-nestedstack
 
   GitHubRepoECS:
     Type: String
-    Default: ecs-demo-php-simple-app
     Description: The repo name of the sample service.
+#   Default: ecs-demo-php-simple-app
+
+  GithubRepoLambda:
+    Type: String
+    Description: github repo for lambda (SAM) code
+#   Default: lambdaSAM
 
   GitHubBranch:
     Type: String
-    Default: master
     Description: The branch of the repo to continuously deploy.
+#    Default: master
 
   GitHubToken:
     Type: String
     Description: Token for the user specified above. (https://github.com/settings/tokens)
-    Default: blank
+#   Default: blank
 
 
 Metadata:
@@ -60,6 +65,8 @@ Metadata:
           default: GitHub Configuration
         Parameters:
           - GitHubRepoECS
+          - GitHubRepoPlatform
+          - GithubRepoLambda
           - GitHubBranch
           - GitHubUser
           - GitHubToken
@@ -143,7 +150,7 @@ Resources:
 
 
 ## application pipeline for ECS
-  ECSDeploymentPipeline:
+  ECS_CICD:
     Type: AWS::CloudFormation::Stack
     Properties:
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-deployment-pipeline.yaml
@@ -161,27 +168,33 @@ Resources:
         TargetGroup: !GetAtt ECSAppLoadBalancer.Outputs.TargetGroup
         TemplateBucket: !Sub ecs-refarch-cicd-template-bucket-${AWS::Region}
 
-  #  LambdaDeploymentPipeline:
-  #    Type: AWS::CloudFormation::Stack
-  #    Properties:
-  #      TemplateURL: https://s3.amazonaws.com/ecs-refarch-continuous-deployment/templates/lambda-deployment-pipeline.yaml
-  #      Parameters:
-  #        Cluster: !GetAtt Cluster.Outputs.ClusterName
-  #        GitHubUser: !Ref GitHubUser
-  #        GitHubToken: !Ref GitHubToken
-  #        GitHubRepo: !Ref GitHubRepo
-  #        GitHubBranch: !Ref GitHubBranch
-  #        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
-  #        TemplateBucket: !Sub lambda-refarch-cicd-template-bucket-${AWS::Region}
+   Lambda_CICD:
+     Type: AWS::CloudFormation::Stack
+     Properties:
+ #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/lambda-deployment-pipeline.yaml
+       TemplateURL: !Join
+         - "/"
+         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+           - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
+           - lambda-deployment-pipeline.yaml
+       Parameters:
+         GitHubUser: !Ref GitHubUser
+         GitHubToken: !Ref GitHubToken
+         GithubRepoLambda: !Ref GithubRepoLambda
+         GitHubBranch: !Ref GitHubBranch
 
 Outputs:
   ECSLoadBalancerUrl:
     Description: ECS Application Loadbalancer's URL
     Value: !GetAtt ECSAppLoadBalancer.Outputs.LoadBalancerUrl
 
-  ECSPipelineUrl:
-    Description: The continuous deployment pipeline in the AWS Management Console.
-    Value: !GetAtt ECSDeploymentPipeline.Outputs.PipelineUrl
+  ECS_CICD_Url:
+    Description: The ECS continuous deployment pipeline in the AWS Management Console.
+    Value: !GetAtt ECS_CICD.Outputs.PipelineUrl
+
+  Lambda_CICD_Url:
+    Description: The Lambda continuous deployment pipeline in the AWS Management Console.
+    Value: !GetAtt Lambda_CICD.Outputs.PipelineUrl
 
   MasterStackName:
     Description: name of this master nested stack
