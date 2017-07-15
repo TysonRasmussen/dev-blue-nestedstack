@@ -1,5 +1,8 @@
 Parameters:
-  GitHubRepo:
+  GitHubRepoPlatform:
+    Type: String
+
+  GitHubRepoECS:
     Type: String
 
   GitHubBranch:
@@ -186,7 +189,7 @@ Resources:
                 Provider: GitHub
               Configuration:
                 Owner: !Ref GitHubUser
-                Repo: !Ref GitHubRepo
+                Repo: !Ref GitHubRepoECS
                 Branch: !Ref GitHubBranch
                 OAuthToken: !Ref GitHubToken
               OutputArtifacts:
