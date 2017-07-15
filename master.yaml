@@ -21,6 +21,11 @@ Parameters:
     Description: Your username on GitHub.
     Default: shehryarabbasi
 
+  GitHubRepoPlatform:
+    Description: first github repo which contains the nested stacks
+    Type: String
+    Default: dev-blue-nestedstack
+
   GitHubRepoECS:
     Type: String
     Default: ecs-demo-php-simple-app
