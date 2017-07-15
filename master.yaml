@@ -21,7 +21,7 @@ Parameters:
     Description: Your username on GitHub.
     Default: shehryarabbasi
 
-  GitHubRepo:
+  GitHubRepoECS:
     Type: String
     Default: ecs-demo-php-simple-app
     Description: The repo name of the sample service.

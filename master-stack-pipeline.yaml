@@ -19,9 +19,15 @@ Parameters:
     Type: String
     Default: dev-blue-artifactbucket
 
-  GitHubRepo:
+  GitHubRepoPlatform:
+    Description: first github repo which contains the nested stacks
     Type: String
     Default: dev-blue-nestedstack
+
+  GitHubRepoECS:
+    Description: second github repo which contains the ECS app code (docker)
+    Type: String
+    Default: ecs-demo-php-simple-app
 
   GitHubBranch:
     Type: String
@@ -128,8 +134,7 @@ Resources:
                   Statement:
                     - Effect: Allow
                       Resource:
-                        - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build'
-                        - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GitHubRepo}_build:*'
+                        - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/*'
                       Action:
                         - 'logs:CreateLogGroup'
                         - 'logs:CreateLogStream'
@@ -144,7 +149,7 @@ Resources:
   CodeBuildProject:
       Type: AWS::CodeBuild::Project
       Properties:
-          Name: !Sub '${GitHubRepo}_build'
+          Name: !Sub '${GitHubRepoPlatform}_build'
           Description: Build project for the Lambda service
           Artifacts:
             Type: CODEPIPELINE
@@ -177,7 +182,7 @@ Resources:
                 Provider: GitHub
               Configuration:
                 Owner: !Ref GitHubUser
-                Repo: !Ref GitHubRepo
+                Repo: !Ref GitHubRepoPlatform
                 Branch: !Ref GitHubBranch
                 OAuthToken: !Ref GitHubToken
               OutputArtifacts:
@@ -212,7 +217,7 @@ Resources:
                 ActionMode: CHANGE_SET_REPLACE
                 ChangeSetName: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
                 StackName: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
-                Capabilities: CAPABILITY_IAM
+                Capabilities: CAPABILITY_NAMED_IAM
                 TemplatePath: NestedStackZip::master.yaml
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 ParameterOverrides: !Sub |
@@ -220,19 +225,20 @@ Resources:
                     "EnvironmentName": "${EnvironmentName}",
                     "EnvironmentFlag": "${EnvironmentFlag}",
                     "GitHubUser": "${GitHubUser}",
-                    "GitHubRepo": "${GitHubRepo}",
+                    "GitHubRepoPlatform": "${GitHubRepoPlatform}",
+                    "GitHubRepoECS": "${GitHubRepoECS}",
                     "GitHubBranch": "${GitHubBranch}"
                   }
               InputArtifacts:
                 - Name: NestedStackZip
               RunOrder: 1
-            # - Name: DeploymentApproval
-            #   ActionTypeId:
-            #     Category: Approval
-            #     Owner: AWS
-            #     Provider: Manual
-            #     Version: 1
-            #   RunOrder: 2
+            - Name: DeploymentApproval
+              ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: 1
+              RunOrder: 2
             - Name: ExecuteChangeSet
               ActionTypeId:
                 Category: Deploy
@@ -241,13 +247,12 @@ Resources:
                 Version: 1
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
-                Capabilities: CAPABILITY_NAMED_IAM
                 RoleArn: !GetAtt CloudFormationExecutionRole.Arn
                 StackName: !Sub "${EnvironmentName}-${EnvironmentFlag}-MasterStack"
                 ChangeSetName: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
               OutputArtifacts:
                 - Name: !Sub "${EnvironmentName}-${EnvironmentFlag}-ChangeSet"
-              RunOrder: 2
+              RunOrder: 3
 
 
 
