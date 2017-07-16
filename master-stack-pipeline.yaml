@@ -9,15 +9,15 @@ Parameters:
     Type: String
     Default: blue
 
-  BuildArtifactsBucket:
-    Description: existing s3 bucket, in this Region, to store build artifacts
-    Type: String
-    Default: ref-arch-msi
-
-  BuildArtifactsBucketFolder:
-    Description: subfolder inside existing s3 bucket, in this Region, to store build artifacts
-    Type: String
-    Default: dev-blue-artifactbucket
+  # BuildArtifactsBucket:
+  #   Description: existing s3 bucket, in this Region, to store build artifacts
+  #   Type: String
+  #   Default: ref-arch-msi
+  #
+  # BuildArtifactsBucketFolder:
+  #   Description: subfolder inside existing s3 bucket, in this Region, to store build artifacts
+  #   Type: String
+  #   Default: dev-blue-artifactbucket
 
   GitHubRepoPlatform:
     Description: first github repo which contains the nested stacks
@@ -50,6 +50,8 @@ Parameters:
 
 Resources:
 
+  BuildArtifactsBucket:
+      Type: AWS::S3::Bucket
   CloudFormationExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -155,7 +157,7 @@ Resources:
   CodeBuildProject:
       Type: AWS::CodeBuild::Project
       Properties:
-          Name: !Sub '${GitHubRepoPlatform}_build'
+          Name: !Sub '${GitHubRepoPlatform}_build_${AWS::StackName}'
           Description: Build project for the Lambda service
           Artifacts:
             Type: CODEPIPELINE
@@ -165,7 +167,7 @@ Resources:
               Image: aws/codebuild/eb-nodejs-4.4.6-amazonlinux-64:2.1.3
               EnvironmentVariables:
                 - Name: BUILD_OUTPUT_BUCKET
-                  Value: !Sub ${BuildArtifactsBucket}
+                  Value: !Ref BuildArtifactsBucket
           ServiceRole: !GetAtt CodeBuildServiceRole.Arn
           Source:
               Type: CODEPIPELINE
@@ -268,6 +270,6 @@ Outputs:
     Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}
 
   BuildArtifactsBucket:
-    Value: !Sub ${BuildArtifactsBucket}/${BuildArtifactsBucketFolder}
+    Value: !Ref BuildArtifactsBucket
     Export:
       Name: !Join [ "-", [ !Ref EnvironmentName, !Ref EnvironmentFlag, "BuildArtifacts" ]]
