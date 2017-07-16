@@ -4,7 +4,7 @@ phases:
   build:
     commands:
       - echo "Copying files to S3"
-      - aws s3 sync . "s3://${BUILD_OUTPUT_BUCKET}/"
+      - aws s3 sync . s3://${BUILD_OUTPUT_BUCKET}/
 
 artifacts:
   files:
