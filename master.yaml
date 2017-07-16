@@ -3,12 +3,12 @@ Parameters:
   EnvironmentName:
     Description: An environment name that will be prefixed to resource names
     Type: String
-    Default: dev
+#    Default: dev
 
   EnvironmentFlag:
     Description: An environment name that will be prefixed to resource names
     Type: String
-    Default: blue
+#    Default: blue
 
   # we will be Importing in the name of the s3 bucket from the Export of master-stack-pipeline.yaml
   # BuildArtifactsBucket:
