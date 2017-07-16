@@ -168,20 +168,20 @@ Resources:
         TargetGroup: !GetAtt ECSAppLoadBalancer.Outputs.TargetGroup
         TemplateBucket: !Sub ecs-refarch-cicd-template-bucket-${AWS::Region}
 
-   LambdaCICD:
-     Type: AWS::CloudFormation::Stack
-     Properties:
- #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/lambda-deployment-pipeline.yaml
-       TemplateURL: !Join
-         - "/"
-         - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
-           - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
-           - lambda-deployment-pipeline.yaml
-       Parameters:
-         GitHubUser: !Ref GitHubUser
-         GitHubToken: !Ref GitHubToken
-         GithubRepoLambda: !Ref GithubRepoLambda
-         GitHubBranch: !Ref GitHubBranch
+  LambdaCICD:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+#      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/lambda-deployment-pipeline.yaml
+      TemplateURL: !Join
+        - "/"
+        - - !Sub "https://s3-${AWS::Region}.amazonaws.com"
+          - Fn::ImportValue: !Sub ${EnvironmentName}-${EnvironmentFlag}-BuildArtifacts
+          - lambda-deployment-pipeline.yaml
+      Parameters:
+        GitHubUser: !Ref GitHubUser
+        GitHubToken: !Ref GitHubToken
+        GithubRepoLambda: !Ref GithubRepoLambda
+        GitHubBranch: !Ref GitHubBranch
 
 Outputs:
   ECSLoadBalancerUrl:
