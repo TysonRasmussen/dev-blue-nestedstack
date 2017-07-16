@@ -150,6 +150,7 @@ Resources:
                     - Effect: Allow
                       Resource:
                         - !Sub 'arn:aws:s3:::${BuildArtifactsBucket}/*'
+                        - !Sub 'arn:aws:s3:::${BuildArtifactsBucket}'
                       Action:
                         - 's3:*'
   CodeBuildProject:

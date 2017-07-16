@@ -150,7 +150,7 @@ Resources:
 
 
 ## application pipeline for ECS
-  ECS_CICD:
+  ECSCICD:
     Type: AWS::CloudFormation::Stack
     Properties:
 #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/ecs-deployment-pipeline.yaml
@@ -168,7 +168,7 @@ Resources:
         TargetGroup: !GetAtt ECSAppLoadBalancer.Outputs.TargetGroup
         TemplateBucket: !Sub ecs-refarch-cicd-template-bucket-${AWS::Region}
 
-   Lambda_CICD:
+   LambdaCICD:
      Type: AWS::CloudFormation::Stack
      Properties:
  #      TemplateURL: !Sub https://s3-${AWS::Region}/${BuildArtifactsBucket}/lambda-deployment-pipeline.yaml
@@ -188,11 +188,11 @@ Outputs:
     Description: ECS Application Loadbalancer's URL
     Value: !GetAtt ECSAppLoadBalancer.Outputs.LoadBalancerUrl
 
-  ECS_CICD_Url:
+  ECSCICDUrl:
     Description: The ECS continuous deployment pipeline in the AWS Management Console.
     Value: !GetAtt ECS_CICD.Outputs.PipelineUrl
 
-  Lambda_CICD_Url:
+  LambdaCICDUrl:
     Description: The Lambda continuous deployment pipeline in the AWS Management Console.
     Value: !GetAtt Lambda_CICD.Outputs.PipelineUrl
 
