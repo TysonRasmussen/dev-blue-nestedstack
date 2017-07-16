@@ -232,6 +232,7 @@ Resources:
                     "EnvironmentName": "${EnvironmentName}",
                     "EnvironmentFlag": "${EnvironmentFlag}",
                     "GitHubUser": "${GitHubUser}",
+                    "GitHubToken": "${GitHubToken}",
                     "GitHubRepoPlatform": "${GitHubRepoPlatform}",
                     "GitHubRepoECS": "${GitHubRepoECS}",
                     "GithubRepoLambda": "${GithubRepoLambda}",
