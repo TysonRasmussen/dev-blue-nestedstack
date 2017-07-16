@@ -190,11 +190,11 @@ Outputs:
 
   ECSCICDUrl:
     Description: The ECS continuous deployment pipeline in the AWS Management Console.
-    Value: !GetAtt ECS_CICD.Outputs.PipelineUrl
+    Value: !GetAtt ECSCICD.Outputs.PipelineUrl
 
   LambdaCICDUrl:
     Description: The Lambda continuous deployment pipeline in the AWS Management Console.
-    Value: !GetAtt Lambda_CICD.Outputs.PipelineUrl
+    Value: !GetAtt LambdaCICD.Outputs.PipelineUrl
 
   MasterStackName:
     Description: name of this master nested stack
