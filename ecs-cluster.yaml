@@ -76,7 +76,7 @@ Resources:
     ECSCluster:
         Type: AWS::ECS::Cluster
         Properties:
-            ClusterName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSCluster
+            ClusterName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSCluster-${AWS::StackName}
 
     ECSAutoScalingGroup:
         Type: AWS::AutoScaling::AutoScalingGroup
@@ -89,7 +89,7 @@ Resources:
             Tags:
                 -
                   Key: Name
-                  Value: !Sub ${EnvironmentName}-${EnvironmentFlag} ECS host
+                  Value: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECS-host-${AWS::StackName}
                   PropagateAtLaunch: true
                 -
                   Key: EnvironmentName
@@ -168,7 +168,7 @@ Resources:
         Type: AWS::IAM::Role
         Properties:
             Path: /
-            RoleName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSRole-${AWS::Region}
+            RoleName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSRole-${AWS::StackName}-${AWS::Region}
             AssumeRolePolicyDocument: |
                 {
                     "Statement": [{
