@@ -46,9 +46,7 @@ Resources:
                     Version: '2012-10-17'
                     Statement:
                       - Effect: Allow
-                        Resource:
-                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GithubRepoLambda}_build_${AWS::StackName}'
-                          - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${GithubRepoLambda}_build${AWS::StackName}:*'
+                        Resource: '*'
                         Action:
                           - 'logs:CreateLogGroup'
                           - 'logs:CreateLogStream'
