@@ -63,7 +63,7 @@ Resources:
     CodeBuildProject:
         Type: AWS::CodeBuild::Project
         Properties:
-            Name: !Sub '${GithubRepoLambda}_build'
+            Name: !Sub '${GithubRepoLambda}_build_${AWS::StackName}'
             Description: Build project for the Lambda service
             Artifacts:
               Type: CODEPIPELINE

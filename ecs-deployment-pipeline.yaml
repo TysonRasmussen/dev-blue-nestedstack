@@ -135,6 +135,7 @@ Resources:
   CodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
+
       Artifacts:
         Location: !Ref ArtifactBucket
         Type: "S3"
@@ -166,7 +167,7 @@ Resources:
             Value: !Ref AWS::Region
           - Name: REPOSITORY_URI
             Value: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}
-      Name: !Ref AWS::StackName
+      Name: !Sub '${GitHubRepoECS}_build_${AWS::StackName}'
       ServiceRole: !Ref CodeBuildServiceRole
 
   Pipeline:
