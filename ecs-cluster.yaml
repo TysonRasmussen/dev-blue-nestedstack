@@ -74,9 +74,7 @@ Mappings:
 Resources:
 
     ECSCluster:
-        Type: AWS::ECS::Cluster
-        Properties:
-            ClusterName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSCluster-${AWS::StackName}
+      Type: AWS::ECS::Cluster
 
     ECSAutoScalingGroup:
         Type: AWS::AutoScaling::AutoScalingGroup
@@ -168,7 +166,6 @@ Resources:
         Type: AWS::IAM::Role
         Properties:
             Path: /
-            RoleName: !Sub ${EnvironmentName}-${EnvironmentFlag}-ECSRole-${AWS::StackName}-${AWS::Region}
             AssumeRolePolicyDocument: |
                 {
                     "Statement": [{
