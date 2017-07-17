@@ -153,7 +153,6 @@ Resources:
             ArtifactStore:
                 Location: !Ref BuildArtifactsBucket
                 Type: S3
-            Name: !Sub ${GithubRepoLambda}_pipeline
             RoleArn: !GetAtt PipelineExecutionRole.Arn
             Stages:
                 - Name: Source
