@@ -17,7 +17,7 @@ phases:
       - echo "Copying templates to S3"
       - |
         for template in $TEMPLATE_FILES; do
-            aws s3 cp "$template" "s3://ref-arch-msi/dev-blue-artifactbucket/$template"
+            aws s3 cp "$template" "s3://msi-ref-arch2/dev-blue-artifactbucket/$template"
         done
 
 artifacts:
