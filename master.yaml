@@ -39,7 +39,7 @@ Parameters:
   GitHubToken:
     Type: String
     Description: Token for the user specified above. (https://github.com/settings/tokens)
-    Default: a32082e643ecb9500d4efbb846e3cd24b8b892cb 
+    Default: 2152f4803f3587bcc04ab275e5bcc0726531be66 
 
 
 Metadata:
