@@ -12,7 +12,7 @@ Parameters:
   BuildArtifactsBucket:
     Description: existing s3 bucket, in this Region, to store build artifacts
     Type: String
-    Default: ref-arch-msi
+    Default: msi-ref-arch2
 
   BuildArtifactsBucketFolder:
     Description: subfolder inside existing s3 bucket, in this Region, to store build artifacts
@@ -35,11 +35,11 @@ Parameters:
 
   GitHubToken:
     Type: String
-    Default: blank
+    Default: a32082e643ecb9500d4efbb846e3cd24b8b892cb 
 
   GitHubUser:
     Type: String
-    Default: shehryarabbasi
+    Default: livid727 
 
 
 Resources:

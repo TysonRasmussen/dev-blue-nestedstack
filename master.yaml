@@ -19,7 +19,7 @@ Parameters:
   GitHubUser:
     Type: String
     Description: Your username on GitHub.
-    Default: shehryarabbasi
+    Default: livid727 
 
   GitHubRepoPlatform:
     Description: first github repo which contains the nested stacks
@@ -39,7 +39,7 @@ Parameters:
   GitHubToken:
     Type: String
     Description: Token for the user specified above. (https://github.com/settings/tokens)
-    Default: blank
+    Default: a32082e643ecb9500d4efbb846e3cd24b8b892cb 
 
 
 Metadata:
